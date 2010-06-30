@@ -1,0 +1,12 @@
+#scaffold
+  %canvas#paper{class: 'draw', width: "300", height: "300"}
+  #pencils
+    :each pencil in pencils
+      %canvas{class: "pencil inactivePencil"}&= pencil
+  #colors
+    :each color in colors
+      %span{class: "color inactiveColor", style: "background-color: #{color};"}
+  .remainingTime
+    Time remaining:
+    %span#countdown
+      00:00

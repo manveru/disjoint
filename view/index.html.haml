@@ -1,0 +1,8 @@
+%a{href: '/play'}
+  Join a game
+
+.stories
+  :if stories.length > 0
+    :each story in stories
+      .story
+        %img{src: "/#{story.value.image}"}

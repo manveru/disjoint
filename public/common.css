@@ -1,0 +1,79 @@
+#scaffold {
+  width: 450px;
+  height: 300px;
+  margin: auto;
+}
+
+#paper {
+  width: 300px;
+  height: 300px;
+  -webkit-box-shadow: 5px 5px 5px #888;
+  -moz-box-shadow: 5px 5px 5px #888;
+  font-family: Postit, serif
+}
+
+#colors {
+  float: left;
+  width: 20px;
+}
+
+#pencils {
+  float: left;
+  width: 50px;
+}
+
+.color {
+  margin: 1px;
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.inactiveColor {
+  border: 1px solid black;
+}
+
+.activeColor {
+  border: 1px solid red;
+}
+
+.pencil {
+  margin: 1px;
+  display: block;
+  margin: auto;
+}
+
+h1, h2 {
+  font-family: Postit
+}
+
+form.write {
+  background-image: url('/postit.png');
+  width: 300px;
+  height: 310px;
+  padding-left: 15px;
+}
+
+form.write textarea {
+  font-family: Postit;
+  text-align: center;
+  width: 260px;
+  margin-top: 15px;
+  border: 0px;
+  margin-right: 10px;
+  font-size: 2.5em;
+  height: 6em;
+  overflow: hidden;
+  background: transparent;
+}
+
+@font-face {
+  font-family: Postit;
+  font-style: normal;
+  font-weight: normal;
+  src: local('Reenie Beanie'), url('http://themes.googleusercontent.com/font?kit=ljpKc6CdXusL1cnGUSamX_cCQibwlboQP4eCflnqtq0') format('truetype');
+}
+
+#indicator {
+  display: block;
+}
