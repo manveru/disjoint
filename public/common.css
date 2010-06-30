@@ -48,24 +48,19 @@ h1, h2 {
   font-family: Postit
 }
 
-form.write {
+#write {
   background-image: url('/postit.png');
+  background-position: center;
   width: 300px;
-  height: 310px;
-  padding-left: 15px;
+  min-height: 300px;
+  font: 2.5em Postit;
+  text-align: center;
 }
 
-form.write textarea {
-  font-family: Postit;
-  text-align: center;
-  width: 260px;
-  margin-top: 15px;
-  border: 0px;
-  margin-right: 10px;
-  font-size: 2.5em;
-  height: 6em;
-  overflow: hidden;
-  background: transparent;
+#write p {
+  margin: 0;
+  padding: 0;
+  width: 270px;
 }
 
 @font-face {

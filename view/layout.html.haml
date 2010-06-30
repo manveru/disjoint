@@ -4,14 +4,22 @@
     %title= "Disjoint - #{title}"
     %link{rel: "stylesheet", href: "/common.css"}
     %script{src: '/jquery-1.4.2.min.js'}
-    %script{src: '/maxchar.js'}
     %script{src: '/base64.js'}
     %script{src: '/canvas2image.js'}
     %script{src: '/disjoint.js'}
     :javascript
       $(document).ready(function(){
         new document.Disjoint($('#paper'));
-        $('.write textarea').maxChar(86);
+        var editable = $('.contenteditable');
+
+        editable.blur(function () {
+          // lame that we're hooking the blur event
+          document.designMode = 'off';
+        });
+
+        editable.focus(function () {
+          document.designMode = 'on';
+        });
       });
     :javascript
       var rpxJsHost = (("https:" == document.location.protocol) ? "https://" : "http://static.");

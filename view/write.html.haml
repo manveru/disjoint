@@ -1,6 +1,31 @@
 #scaffold
-  %span#write{contenteditable: true}
-    an evil pink dino holding a baseball bat threatning a man in a blue shirt
+  #write{contenteditable: 'true', tabindex: 0}
+    %p
+      an evil pink dino holding a baseball bat threatning a man in a blue shirt
+  :javascript
+    var check = function(tag){
+      console.debug(tag.height());
+      if(tag.height() > 320){
+        var paragraphs = tag.map(function(){
+          var tmp = this.innerText;
+          if(tmp !== ''){ return tmp; }
+        }).toArray();
+        console.debug(paragraphs);
+        var text = paragraphs.join("\n");
+        console.debug(text);
+        text = text.slice(0, text.length - 1);
+        console.debug(text);
+        // text = "<p>" + text.split("\n").join("</p><p>") + "</p>";
+        console.debug(text);
+        tag.text(function(index, old){
+          if(index == 0){ return text; } else { return ""; }
+        });
+        tag.blur();
+        tag.focus();
+      }
+      setTimeout(check, 200, tag);
+    };
+    check($('#write p'));
   .remainingTime
     Time remaining:
     %span#countdown
