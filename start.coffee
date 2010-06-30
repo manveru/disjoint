@@ -81,6 +81,25 @@ pump: (readStream, writeStream, callback) ->
   readStream.addListener "close", ->
     callback if callback
 
+
+withRequestBody: (req, callback) ->
+  chunks: []
+
+  req.addListener 'data', (chunk) ->
+    chunks.push chunk
+
+  req.addListener 'end', ->
+    totalLength: chunks.reduce (sum, chunk) ->
+      sum + chunk.length
+    , 0
+    body: new Buffer(totalLength)
+    offset: 0
+    for chunk in chunks
+      length: chunk.length
+      chunk.copy body, offset, 0, length
+      offset += length
+    callback(body)
+
 templates: {}
 
 compile: (path) ->
@@ -184,24 +203,13 @@ router.get('/play').bind (req, res, next) ->
           title: 'Write the beginning of a new story'
         }
 
-router.post('/save').
-       bind (req, res, next) ->
-  chunks: []
+router.post('/save_write').bind (req, res, next) ->
+  withRequestBody req, (body) ->
+    p 'save_write'
+    p body.toString('utf8')
 
-  req.addListener 'data', (chunk) ->
-    chunks.push chunk
-
-  req.addListener 'end', ->
-    totalLength: chunks.reduce (sum, chunk) ->
-      sum + chunk.length
-    , 0
-    body: new Buffer(totalLength)
-    offset: 0
-    for chunk in chunks
-      length: chunk.length
-      chunk.copy body, offset, 0, length
-      offset += length
-
+router.post('/save_draw').bind (req, res, next) ->
+  withRequestBody req, (body) ->
     binary: Base64.decode(body.toString('binary'))
     hash: crypto.createHash('sha1')
     hash.update(binary)

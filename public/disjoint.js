@@ -10,7 +10,9 @@
     if (canvas.length > 0) {
       this.canvas = canvas;
       this.ctx = canvas[0].getContext('2d');
-      canvas.hasClass('draw') ? this.initDraw() : this.initWrite();
+      canvas.hasClass('draw') ? this.initDraw() : null;
+    } else if ($('#write').length > 0) {
+      this.initWrite();
     }
     return this;
   };
@@ -80,7 +82,7 @@
     this.pencil = parseInt(this.pencils.first().text());
     this.refreshPencils();
     this.drawNote();
-    return this.startDrawing();
+    return this.startCountdown(5 * 60, this.saveDraw);
   };
   Disjoint.prototype.refreshPencils = function() {
     var self;
@@ -104,17 +106,33 @@
     });
   };
   Disjoint.prototype.initWrite = function() {
-    this.drawNote();
-    return this.drawNoteText();
+    var self;
+    this.noteTextControl(this);
+    self = this;
+    $('#writeDone').click(function(event) {
+      return self.saveWrite(self);
+    });
+    return this.startCountdown(5 * 60, this.saveWrite);
   };
-  Disjoint.prototype.drawNoteText = function() {
-    var text;
-    text = $('#write').text();
-    this.ctx.fillStyle = '#000';
-    this.ctx.font = "50px StickIt";
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'top';
-    return this.ctx.fillText(text, 150, 10);
+  Disjoint.prototype.noteTextControl = function(self) {
+    var paragraphs, text;
+    if ($('#write').height() > 320) {
+      paragraphs = $('#write p').map(function() {
+        if (this.innerText !== '') {
+          return this.innerText;
+        }
+      });
+      text = paragraphs.toArray().join("\n");
+      text = text.slice(0, (text.length - 1));
+      $('#write p').text(function(index, old) {
+        if (index === 0) {
+          return text;
+        } else {
+          return "";
+        }
+      });
+    }
+    return setTimeout(self.noteTextControl, 200, self);
   };
   Disjoint.prototype.drawNote = function() {
     var bottom, c, gradient, left, right, top;
@@ -125,10 +143,8 @@
     right = c.attr('width');
     gradient = this.ctx.createLinearGradient(bottom, left, top, right);
     gradient.addColorStop(0, "#ffe68f");
-    // top right
     gradient.addColorStop(0.2, "#ffe68f");
     gradient.addColorStop(1, "#fde873");
-    // bottom left
     this.ctx.beginPath();
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(top, left, bottom, right);
@@ -150,28 +166,44 @@
     offset = this.canvas.offset();
     return [event.pageX - offset.left, event.pageY - offset.top];
   };
-  Disjoint.prototype.startDrawing = function() {
-    this.timeLeft = 1 * 5;
-    return this.countdown();
+  Disjoint.prototype.startCountdown = function(seconds, onDone) {
+    this.timeLeft = seconds;
+    return this.countdown(this, onDone);
   };
-  Disjoint.prototype.countdown = function(self) {
+  Disjoint.prototype.countdown = function(self, onDone) {
     var min, sec;
-    self = (typeof self !== "undefined" && self !== null) ? self : this;
     self.timeLeft -= 1;
     if (self.timeLeft > 0) {
       min = Math.floor(self.timeLeft / 60);
+      if (min < 10) {
+        min = ("0" + (min));
+      }
       sec = self.timeLeft % 60;
+      if (sec < 10) {
+        sec = ("0" + (sec));
+      }
       $('#countdown').replaceWith(("<span id='countdown'>" + (min) + ":" + (sec) + "</span>"));
-      return window.setTimeout(self.countdown, 1000, self);
+      return setTimeout(self.countdown, 1000, self);
     } else {
-      return self.save();
+      return onDone(self);
     }
   };
-  Disjoint.prototype.save = function() {
+  Disjoint.prototype.saveDraw = function(self) {
     var data, png;
-    data = this.canvas[0].toDataURL();
+    data = self.canvas[0].toDataURL();
     png = data.slice('data:image/png;base64,'.length, data.length);
-    return jQuery.post('/save', png);
+    return jQuery.post('/saveDraw', png);
+  };
+  Disjoint.prototype.saveWrite = function(self) {
+    var data, paragraphs, text;
+    data = self;
+    paragraphs = $('#write p').map(function() {
+      if (this.innerText !== '') {
+        return this.innerText;
+      }
+    });
+    text = paragraphs.toArray().join("\n");
+    return jQuery.post('/save_write', text);
   };
 
   document.Disjoint = Disjoint;

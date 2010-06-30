@@ -73,3 +73,13 @@ h1, h2 {
 #indicator {
   display: block;
 }
+
+#writeDone {
+  font-size: 2em;
+  margin: 1em;
+}
+
+#writeCancel {
+  font-size: 2em;
+  margin: 1em;
+}

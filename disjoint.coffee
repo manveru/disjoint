@@ -11,8 +11,8 @@ class Disjoint
       @ctx: canvas[0].getContext('2d')
       if canvas.hasClass('draw')
         @initDraw()
-      else
-        @initWrite()
+    else if $('#write').length > 0
+      @initWrite()
 
   initDraw: ->
     @drawing: null
@@ -72,7 +72,7 @@ class Disjoint
     @pencil: parseInt(@pencils.first().text())
     @refreshPencils()
     @drawNote()
-    @startDrawing()
+    @startCountdown(5 * 60, @saveDraw)
 
   refreshPencils: ->
     self: this
@@ -96,16 +96,24 @@ class Disjoint
       ctx.closePath()
 
   initWrite: ->
-    @drawNote()
-    @drawNoteText()
+    @noteTextControl(this)
+    self: this
+    $('#writeDone').click (event) ->
+      self.saveWrite(self)
+    @startCountdown(5 * 60, @saveWrite)
 
-  drawNoteText: ->
-    text: $('#write').text()
-    @ctx.fillStyle: '#000'
-    @ctx.font: "50px StickIt"
-    @ctx.textAlign: 'center'
-    @ctx.textBaseline: 'top'
-    @ctx.fillText text, 150, 10
+  noteTextControl: (self) ->
+    if $('#write').height() > 320
+      paragraphs: $('#write p').map ->
+        return @innerText if @innerText != ''
+      text: paragraphs.toArray().join("\n")
+      text: text[0...(text.length - 1)]
+      $('#write p').text (index, old) ->
+        if index == 0
+          return text
+        else
+          return ""
+    setTimeout self.noteTextControl, 200, self
 
   drawNote: ->
     c: @canvas
@@ -134,24 +142,31 @@ class Disjoint
     offset: @canvas.offset()
     [event.pageX - offset.left, event.pageY - offset.top]
 
-  startDrawing: ->
-    @timeLeft: 1 * 5
-    @countdown()
+  startCountdown: (seconds, onDone) ->
+    @timeLeft: seconds
+    @countdown(this, onDone)
 
-  countdown: (self) ->
-    self ?= this
+  countdown: (self, onDone) ->
     self.timeLeft -= 1
     if self.timeLeft > 0
       min: Math.floor(self.timeLeft / 60)
+      min: "0${min}" if min < 10
       sec: self.timeLeft % 60
+      sec: "0${sec}" if sec < 10
       $('#countdown').replaceWith("<span id='countdown'>${min}:${sec}</span>")
-      window.setTimeout(self.countdown, 1000, self)
+      setTimeout(self.countdown, 1000, self)
     else
-      self.save()
+      onDone(self)
 
-  save: ->
-    data: @canvas[0].toDataURL()
+  saveDraw: (self) ->
+    data: self.canvas[0].toDataURL()
     png: data.slice('data:image/png;base64,'.length, data.length)
-    jQuery.post('/save', png)
+    jQuery.post('/saveDraw', png)
+
+  saveWrite: (self) ->
+    data: self
+    paragraphs: $('#write p').map -> return @innerText if @innerText != ''
+    text: paragraphs.toArray().join("\n")
+    jQuery.post('/save_write', text)
 
 document.Disjoint: Disjoint

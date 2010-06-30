@@ -1,7 +1,5 @@
 (function(){
   var Base64;
-  // Base64 encode / decode
-  // http://www.webtoolkit.info/
   Base64 = {
     keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
     encode: function(input) {
@@ -44,7 +42,6 @@
         enc3 !== 64 ? output += String.fromCharCode(chr2) : null;
         enc4 !== 64 ? output += String.fromCharCode(chr3) : null;
       }
-      // output = @utf8_decode(output)
       return output;
     },
     utf8_encode: function(string) {
