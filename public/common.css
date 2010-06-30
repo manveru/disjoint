@@ -9,6 +9,7 @@
   height: 300px;
   -webkit-box-shadow: 5px 5px 5px #888;
   -moz-box-shadow: 5px 5px 5px #888;
+  box-shadow: 5px 5px 5px #888;
   font-family: Postit, serif
 }
 
